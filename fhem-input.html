@@ -1,0 +1,64 @@
+<script type="text/javascript">
+    RED.nodes.registerType('fhem-in', {
+        category: 'FHEM',
+        color: '#FFFFE7',
+        defaults: {
+            name: { value: "" },
+            fheminstance: { value: "", type: "fhem-instance", required: true },
+            filterDevice: { value: "" },
+            filterReading: { value: "" }
+        },
+        action: { value: '' },
+        position: {
+            value: '',
+            validate: function (v) {
+                return this.action !== 'position' || !isNaN(v);
+            }
+        },
+        optime: {
+            value: '',
+            validate: function (v) {
+                return v.length === 0 || !isNaN(v);
+            }
+        },
+        emitStop: { value: false },
+        inputs: 0,
+        outputs: 1,
+
+        icon: "fhemicon.png",
+        label: function () {
+            if ( this.name ) {
+                return this.name;
+            } else if ( this.filterDevice ) {
+                return "Device:"+this.filterDevice;
+            } else if ( this.filterReading ) {
+                return "Reading:"+this.filterReading;
+            } else {
+                return "fhem-in";
+            }
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="fhem-in">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-fheminstance"><i class="fa fa-cog"></i> Instance</label>
+        <input id="node-input-fheminstance">
+    </div>
+    <div class="form-row">
+        <label for="node-input-filterDevice"><i class="fa fa-tag"></i> Devicefilter</label>
+        <input type="text" id="node-input-filterDevice" placeholder="Devicefilter">
+    </div>
+    <div class="form-row">
+        <label for="node-input-filterReading"><i class="fa fa-tag"></i> Readingsfilter</label>
+        <input type="text" id="node-input-filterReading" placeholder="Readingsfilter">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="fhem-in">
+    <p>A simple node that converts the message from fhem-in characters</p>
+</script>

@@ -1,0 +1,37 @@
+<script type="text/javascript">
+    RED.nodes.registerType('fhem-out',{
+        category: 'FHEM',
+        color: '#FFFFE7',
+        defaults: {
+            name: {value:""},
+            fheminstance: { value: "", type: "fhem-instance", required: true },
+            Device: { value: "", required: true }
+        },
+        inputs:1,
+        outputs:0,
+        icon: "fhemicon.png",
+        align: 'right',
+        label: function() {
+            return this.name||"fhem-out";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="fhem-out">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-fheminstance"><i class="fa fa-cog"></i> FHEM-Instance</label>
+        <input id="node-input-fheminstance">
+    </div>
+    <div class="form-row">
+        <label for="node-input-Device"><i class="fa fa-tag"></i> Device</label>
+        <input type="text" id="node-input-Device" placeholder="Device">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="fhem-out">
+    <p>A node that sends commands directly to fhem instances</p>
+</script>
