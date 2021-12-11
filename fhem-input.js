@@ -4,6 +4,8 @@ module.exports = function (RED) {
         var node;
         var send_count = 0;
         var send_count_stat = [];
+        var connstate = "unknown";
+
         RED.nodes.createNode(this, config);
 
         let fhem = RED.nodes.getNode(config.fheminstance);
@@ -13,16 +15,27 @@ module.exports = function (RED) {
         function updateStatus() {
             send_count_stat.push(send_count);
             send_count = 0;
-            if (send_count_stat.length > 60) {
+            if (send_count_stat.length > 6) {
                 send_count_stat.shift();
             }
             const sum = send_count_stat.reduce((partial_sum, a) => partial_sum + a, 0);
-            node.status({ fill: "green", shape: "dot", text: "connected\n" + parseInt((sum / send_count_stat.length) * 60) + "/Min" });
+            if (connstate == "connected") {
+                node.status({ fill: "green", shape: "dot", text: "connected\n" + parseInt((sum / send_count_stat.length) * 6) + "/Min" });
+            } else if (connstate == "disconnected") {
+                node.status({ fill: "red", shape: "dot", text: "disconnected\n" + parseInt((sum / send_count_stat.length) * 6) + "/Min" });
+            }
+        }
+        function checkConnection() {
+            if (connstate === "disconnected") {
+                //fhem.eventEmitter.emit("reconnect");
+            }
         }
         fhem.eventEmitter.on("connected", () => {
+            connstate = "connected";
             this.status({ fill: "green", shape: "dot", text: "connected" });
         });
         fhem.eventEmitter.on("disconnected", () => {
+            connstate = "disconnected";
             this.status({ fill: "red", shape: "dot", text: "disconnected" });
         });
         fhem.eventEmitter.on("data_received", (data) => {
@@ -73,7 +86,8 @@ module.exports = function (RED) {
             }
 
         });
-        setInterval(updateStatus, 1000);
+        setInterval(updateStatus, 10000);
+        setInterval(checkConnection, 3000);
     }
     RED.nodes.registerType("fhem-in", input);
 }
