@@ -11,6 +11,34 @@
         outputs:0,
         icon: "fhemicon.png",
         align: 'right',
+        oneditprepare: function () {
+            let devices = [];
+            $.getJSON("/fhem/" + this.fheminstance + "/devicelist").done(function (data) {
+                for (let [key, device] of Object.entries(data)) {
+                    devices.push({ "value": device.Name, "label": device.label });
+                }
+            }).fail(function () {
+                RED.notify("Error", "error")
+            })
+
+            $("#node-input-Device").autoComplete({
+                search: function (val) {
+                    var matches = [];
+                    devices.forEach(v => {
+                        var i = v.label.toLowerCase().indexOf(val.toLowerCase());
+                        if (i > -1) {
+                            matches.push({
+                                value: v.value,
+                                label: v.label,
+                                i: i
+                            })
+                        }
+                    });
+                    matches.sort(function (A, B) { return A.i - B.i })
+                    return matches
+                }
+            })
+        },
         label: function() {
             return this.name||"fhem-out";
         }

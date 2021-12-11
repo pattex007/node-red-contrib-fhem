@@ -26,6 +26,9 @@ module.exports = function (RED) {
             }
         }
         fhem.eventEmitter.on("connected", () => {
+            //var nodeContext = this.context();
+            //nodeContext.set("devicelist",fhem.devicelist);
+            //this.context().set("devicelist",fhem.devicelist);
             connstate = "connected";
             this.status({ fill: "green", shape: "dot", text: "connected" });
         });
@@ -36,7 +39,7 @@ module.exports = function (RED) {
         fhem.eventEmitter.on("data_received", (data) => {
             //this.log( data );
             //this.status({ fill: "green", shape: "dot", text: "connected" });
-            var data = data.toString().split("\n");
+            var data = data.split("\n");
             for (var n = 0; n < data.length; n++) {
                 if (data[n] !== "") {
                     var send = true;
@@ -78,6 +81,7 @@ module.exports = function (RED) {
                         send = false;
                     }
                     if (send) {
+                        msg.attributes = fhem.devicelist[msg.device].Attributes;
                         send_count++;
                         this.send(msg);
                     }
@@ -85,7 +89,11 @@ module.exports = function (RED) {
             }
 
         });
+
         setInterval(updateStatus, 10000);
     }
+            
     RED.nodes.registerType("fhem-in", input);
+
+
 }
