@@ -25,11 +25,6 @@ module.exports = function (RED) {
                 node.status({ fill: "red", shape: "dot", text: "disconnected\n" + parseInt((sum / send_count_stat.length) * 6) + "/Min" });
             }
         }
-        function checkConnection() {
-            if (connstate === "disconnected") {
-                //fhem.eventEmitter.emit("reconnect");
-            }
-        }
         fhem.eventEmitter.on("connected", () => {
             connstate = "connected";
             this.status({ fill: "green", shape: "dot", text: "connected" });
@@ -53,6 +48,10 @@ module.exports = function (RED) {
                     var i3 = msg.payload.indexOf(' ', i2 + 1);
 
                     msg.timestamp = msg.payload.substring(0, i1);
+                    //if ms is not included in timestamp, add it
+                    if ( msg.timestamp.length===19) msg.timestamp+=".000";
+                    //this.log(msg.timestamp);
+
                     msg.deviceType = msg.payload.substring(i1 + 1, i2);
                     msg.device = msg.payload.substring(i2 + 1, i3);
 
@@ -87,7 +86,6 @@ module.exports = function (RED) {
 
         });
         setInterval(updateStatus, 10000);
-        setInterval(checkConnection, 3000);
     }
     RED.nodes.registerType("fhem-in", input);
 }
